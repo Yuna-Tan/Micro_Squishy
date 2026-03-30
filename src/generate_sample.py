@@ -10,25 +10,23 @@ from src.geometry.lattice import generate_lattice
 from src.geometry.tpms import generate_tpms_from_raw
 from src.load_raw import load_raw_to_fieldlat_mesh
 
+import numpy as np
+
 tpms_family = ["gyroid", "diamond", "primitive", "lidinoid"]
 
-def generate_sample(raw_path, family, contrast="high"):
+def generate_sample(raw_path, family, structure, params): 
 
-    
-
-    if family in tpms_family:
+    if family == "TPMS":
         mesh = load_raw_to_fieldlat_mesh(raw_path)
 
-        tpms = generate_tpms_from_raw(
+        return generate_tpms_from_raw(
             raw_mesh=mesh,
-            lattice_type=family,
-            min_cell_size=6.0,
-            max_cell_size=15.0,
-            threshold=0.4,
-            resolution=100
+            resolution=int(params["resolution"]),
+            max_cell_size=2*np.pi / params["min_cell_size"],
+            min_cell_size=2*np.pi / params["max_cell_size"],
+            threshold=params["threshold"],
+            lattice_type=structure
         )
-
-        return tpms
     
     elif family == "voronoi":
         scalar = load_raw(raw_path)
