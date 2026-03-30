@@ -18,7 +18,7 @@ def load_raw(
 def load_raw_to_fieldlat_mesh(
     path: str | Path,
     shape=(100, 100, 100),
-    spacing=(1.0, 1.0, 1.0),
+    spacing=(0.2, 0.2, 0.2),
     normalize=True
 ) -> pv.UnstructuredGrid:
     

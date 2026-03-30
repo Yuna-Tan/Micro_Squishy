@@ -22,8 +22,8 @@ def generate_sample(raw_path, family, structure, params):
         return generate_tpms_from_raw(
             raw_mesh=mesh,
             resolution=int(params["resolution"]),
-            max_cell_size=2*np.pi / params["min_cell_size"],
-            min_cell_size=2*np.pi / params["max_cell_size"],
+            max_cell_size=params["min_cell_size"],
+            min_cell_size=params["max_cell_size"],
             threshold=params["threshold"],
             lattice_type=structure
         )

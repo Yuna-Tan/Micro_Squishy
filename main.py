@@ -118,6 +118,19 @@ class MainWindow(QtWidgets.QMainWindow):
             self.mesh = load_raw(file_path)
             print("Loaded:", file_path)
 
+            # ⭐用 FieldLat loader
+            self.fieldlat_mesh = load_raw_to_fieldlat_mesh(file_path)
+
+            # ⭐计算 safe bounds（只针对 TPMS）
+            _, safe_min, safe_max = compute_safe_bounds(
+                self.fieldlat_mesh,
+                resolution=100
+            )
+
+            self.safe_min = safe_min
+            self.safe_max = safe_max
+
+
         # self.plotter.add_mesh(self.mesh, color="lightblue")
         # self.plotter.reset_camera() 
         self.plotter.clear()
@@ -131,6 +144,10 @@ class MainWindow(QtWidgets.QMainWindow):
         family = self.family_box.currentText()
         structure = self.structure_box.currentText()
         params = self.get_params()
+
+        # if params["min_cell_size"] >= params["max_cell_size"]:
+        #     print("⚠️ Fixing invalid cell size")
+        #     params["min_cell_size"] = params["max_cell_size"] * 0.5
 
         self.mesh = generate_sample(
             raw_path=self.raw_path,
@@ -195,11 +212,19 @@ class MainWindow(QtWidgets.QMainWindow):
                 widget.deleteLater()
 
         self.param_widgets.clear()
-
+        
         family = self.family_box.currentText()
         params = STRUCTURE_FAMILIES[family]["params"]
 
         for name, (min_v, max_v, default) in params.items():
+            if family == "TPMS" and name == "min_cell_size":
+                min_v = self.safe_min
+                max_v = self.safe_max
+
+            if family == "TPMS" and name == "max_cell_size":
+                min_v = self.safe_min
+                max_v = self.safe_max
+
             spin = QtWidgets.QDoubleSpinBox()
             spin.setRange(min_v, max_v)
             spin.setValue(default)
