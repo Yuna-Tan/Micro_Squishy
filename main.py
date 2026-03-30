@@ -15,7 +15,7 @@ from src.load_raw import load_raw
 from src.utils.bounds import compute_safe_bounds
 from src.load_raw import load_raw_to_fieldlat_mesh
 
-STRUCTURES = ["gyroid", "diamond", "primitive", "lidinoid", "voronoi", "lattice"]
+# STRUCTURES = ["gyroid", "diamond", "primitive", "lidinoid", "voronoi", "lattice"]
 
 STRUCTURE_FAMILIES = {
     "TPMS": {
@@ -37,10 +37,10 @@ STRUCTURE_FAMILIES = {
     },
 
     "Lattice": {
-        "structures": ["cubic", "bcc", "fcc"],
-        "params": {
-            "cell_size": (2, 20, 8),
-            "strut_thickness": (0.2, 1.0, 0.4)
+    "structures": ["octet", "bcc", "cubic"],
+    "params": {
+        "cell_size": (5, 20, 10),
+        "thickness": (0.2, 1.0, 0.4)
         }
     }
 }

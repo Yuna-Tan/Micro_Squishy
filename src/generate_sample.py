@@ -5,14 +5,13 @@ from src.core.calibration import map_to_param
 
 from src.geometry.gyroid import generate_gyroid
 from src.geometry.voronoi import generate_voronoi
-from src.geometry.lattice import generate_lattice
+from src.geometry.lattice import generate_lattice_implicit
 
 from src.geometry.tpms import generate_tpms_from_raw
 from src.load_raw import load_raw_to_fieldlat_mesh
 
 import numpy as np
 
-tpms_family = ["gyroid", "diamond", "primitive", "lidinoid"]
 
 def generate_sample(raw_path, family, structure, params): 
 
@@ -37,14 +36,18 @@ def generate_sample(raw_path, family, structure, params):
 
         mesh = generate_voronoi(param)
 
-    elif family == "lattice":
+    elif family == "Lattice":
         scalar = load_raw(raw_path)
         scalar = normalize_scalar(scalar)
 
-        k = scalar
-        param = map_to_param(k, family)
+        mesh = generate_lattice_implicit(
+            param_field=scalar,
+            cell_size=params["cell_size"],
+            thickness=params["thickness"],
+            cell_type=structure
+        )
 
-        mesh = generate_lattice(param)
+        return mesh
 
     else:
         raise ValueError("Unknown")
