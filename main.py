@@ -27,11 +27,19 @@ STRUCTURE_FAMILIES = {
         }
     },
 
-    "Stochastic": {
-    "structures": ["Voronoi"],
+    "Voronoi": {
+    "structures": ["voronoi"],
     "params": {
         "seed_count": (50, 1000, 300),
         "final_points": (50, 300, 100)
+        }
+    },
+
+    "Spinodal": {
+        "structures": ["spinodal"],
+        "params": {
+            "sigma": (1.0, 10.0, 3.0),
+            "threshold": (-1.0, 1.0, 0.0)
         }
     },
 

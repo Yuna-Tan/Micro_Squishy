@@ -7,6 +7,7 @@ from src.geometry.gyroid import generate_gyroid
 from src.geometry.lattice import generate_lattice_implicit
 from src.geometry.tpms import generate_tpms_from_raw
 from src.geometry.voronoi import generate_voronoi
+from src.geometry.spinodal import generate_spinodal
 
 from src.load_raw import load_raw_to_fieldlat_mesh
 
@@ -27,14 +28,26 @@ def generate_sample(raw_path, family, structure, params):
             lattice_type=structure
         )
     
-    elif family == "Stochastic":
-        if structure == "Voronoi":
-            scalar = load_raw(raw_path)
-            scalar = normalize_scalar(scalar)
+    elif family == "Voronoi":
 
-            mesh = generate_voronoi(scalar)
+        scalar = load_raw(raw_path)
+        scalar = normalize_scalar(scalar)
 
-            return mesh
+        mesh = generate_voronoi(scalar)
+
+        return mesh
+        
+    elif family == "Spinodal":
+        scalar = load_raw(raw_path)
+
+        # ⭐ shape 用数据 shape
+        mesh = generate_spinodal(
+            shape=scalar.shape,
+            sigma=params["sigma"],
+            threshold=params["threshold"]
+        )
+
+        return mesh
 
     elif family == "Lattice":
         scalar = load_raw(raw_path)
