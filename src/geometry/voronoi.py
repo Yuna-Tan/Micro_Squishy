@@ -8,19 +8,25 @@ from squishicalization.scripts import tesselate, sample_elimination
 # 1️⃣ sampling（直接调用）
 # =========================
 def squish_sampling(field, n_seed=300, n_final=100):
-
-    field = (field - field.min()) / (field.max() - field.min() + 1e-8)
+    # already normalized
+    # field = (field - field.min()) / (field.max() - field.min() + 1e-8)
 
     # coords = np.array(np.nonzero(field)).T
-    coords = np.ascontiguousarray(
-        np.array(np.nonzero(field)).T
-    )
+    # coords = np.ascontiguousarray(
+    #     np.array(np.nonzero(field)).T
+    # )
+    coords = np.indices(field.shape).reshape(3, -1).T
 
     rng = np.random.default_rng(42)
     seeds = coords[rng.choice(len(coords), n_seed, replace=False)]
     seeds = np.ascontiguousarray(seeds)
 
-    weights = field[tuple(seeds.T)]
+    if np.std(field) < 1e-6:
+        print("uniform data detected")
+        weights = np.ones(len(seeds))
+    else:
+        print("non-uniform data")
+        weights = field[tuple(seeds.T)]
 
     # ⭐关键：完全使用原函数
     sampled = sample_elimination(
@@ -70,9 +76,11 @@ def squish_mesh(volume, spacing, n_regions):
 # 4️⃣ 总入口（你pipeline用这个）
 # =========================
 def generate_voronoi(field):
-
-    mask = np.zeros_like(field)
-    mask[field > field.min()] = 1
+    if np.std(field) < 1e-6:
+        mask = np.ones_like(field, dtype=np.int32)
+    else:
+        mask = np.zeros_like(field)
+        mask[field > field.min()] = 1
 
     seeds = squish_sampling(field)
 
