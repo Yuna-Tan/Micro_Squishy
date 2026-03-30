@@ -39,7 +39,10 @@ STRUCTURE_FAMILIES = {
         "structures": ["spinodal"],
         "params": {
             "sigma": (1.0, 10.0, 3.0),
-            "threshold": (-1.0, 1.0, 0.0)
+            "threshold": (-1.0, 1.0, 0.0),
+            "encode_strength": (0.0, 2.0, 0.8),
+            "data_smoothing": (0.0, 5.0, 1.0),
+            "seed": (0, 9999, 42)
         }
     },
 

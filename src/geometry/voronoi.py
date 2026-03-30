@@ -75,14 +75,14 @@ def squish_mesh(volume, spacing, n_regions):
 # =========================
 # 4️⃣ 总入口（你pipeline用这个）
 # =========================
-def generate_voronoi(field):
+def generate_voronoi(field, n_seed, n_final):
     if np.std(field) < 1e-6:
         mask = np.ones_like(field, dtype=np.int32)
     else:
         mask = np.zeros_like(field)
         mask[field > field.min()] = 1
 
-    seeds = squish_sampling(field)
+    seeds = squish_sampling(field=field, n_seed=int(n_seed), n_final=int(n_final))
 
     volume = squish_voronoi(mask, seeds)
 

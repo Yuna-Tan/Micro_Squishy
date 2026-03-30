@@ -22,8 +22,8 @@ def generate_sample(raw_path, family, structure, params):
         return generate_tpms_from_raw(
             raw_mesh=mesh,
             resolution=int(params["resolution"]),
-            max_cell_size=params["min_cell_size"],
-            min_cell_size=params["max_cell_size"],
+            max_cell_size=params["max_cell_size"],
+            min_cell_size=params["min_cell_size"],
             threshold=params["threshold"],
             lattice_type=structure
         )
@@ -33,18 +33,25 @@ def generate_sample(raw_path, family, structure, params):
         scalar = load_raw(raw_path)
         scalar = normalize_scalar(scalar)
 
-        mesh = generate_voronoi(scalar)
+        mesh = generate_voronoi(
+            scalar, 
+            n_seed=params["seed_count"], 
+            n_final=params["final_points"]
+        )
 
         return mesh
         
     elif family == "Spinodal":
         scalar = load_raw(raw_path)
+        scalar = normalize_scalar(scalar)
 
-        # ⭐ shape 用数据 shape
         mesh = generate_spinodal(
-            shape=scalar.shape,
-            sigma=params["sigma"],
-            threshold=params["threshold"]
+            scalar_field=scalar,
+            sigma=float(params["sigma"]),
+            base_threshold=float(params["threshold"]),
+            encode_strength=float(params["encode_strength"]),
+            data_smoothing=float(params["data_smoothing"]),
+            seed=int(params["seed"]),
         )
 
         return mesh
@@ -63,6 +70,4 @@ def generate_sample(raw_path, family, structure, params):
         return mesh
 
     else:
-        raise ValueError("Unknown")
-
-    return mesh
+        raise ValueError("Unknown Family")
