@@ -15,7 +15,6 @@ from src.load_raw import load_raw
 from src.utils.bounds import compute_safe_bounds
 from src.load_raw import load_raw_to_fieldlat_mesh
 
-# STRUCTURES = ["gyroid", "diamond", "primitive", "lidinoid", "voronoi", "lattice"]
 
 STRUCTURE_FAMILIES = {
     "TPMS": {
@@ -28,11 +27,11 @@ STRUCTURE_FAMILIES = {
         }
     },
 
-    "Voronoi": {
-        "structures": ["voronoi"],
-        "params": {
-            "cell_size": (2, 20, 8),
-            "thickness": (0.2, 1.0, 0.4)
+    "Stochastic": {
+    "structures": ["Voronoi"],
+    "params": {
+        "seed_count": (50, 1000, 300),
+        "final_points": (50, 300, 100)
         }
     },
 

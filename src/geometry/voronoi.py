@@ -1,23 +1,83 @@
 import numpy as np
-from scipy.spatial import cKDTree
-from src.utils.mesh_utils import field_to_mesh
+import pyvista as pv
+
+from squishicalization.scripts import tesselate, sample_elimination
 
 
-def generate_voronoi(param_field, n_points=200):
-    
-    shape = param_field.shape
+# =========================
+# 1️⃣ sampling（直接调用）
+# =========================
+def squish_sampling(field, n_seed=300, n_final=100):
 
-    # random seeds
-    pts = np.random.rand(n_points, 3)
-    pts *= np.array(shape)
+    field = (field - field.min()) / (field.max() - field.min() + 1e-8)
 
-    grid = np.indices(shape).reshape(3, -1).T
+    # coords = np.array(np.nonzero(field)).T
+    coords = np.ascontiguousarray(
+        np.array(np.nonzero(field)).T
+    )
 
-    tree = cKDTree(pts)
-    dist, _ = tree.query(grid)
+    rng = np.random.default_rng(42)
+    seeds = coords[rng.choice(len(coords), n_seed, replace=False)]
+    seeds = np.ascontiguousarray(seeds)
 
-    field = dist.reshape(shape)
+    weights = field[tuple(seeds.T)]
 
-    field = field - param_field * field.max()
+    # ⭐关键：完全使用原函数
+    sampled = sample_elimination(
+        points=seeds,
+        target=n_final,
+        mindist=0,
+        maxdist=0,
+        weights=weights,
+        params=[[0,1],[10,1]]
+    )
 
-    return field_to_mesh(field, level=0.0)
+    return sampled
+
+
+# =========================
+# 2️⃣ Voronoi（直接调用）
+# =========================
+def squish_voronoi(mask, seeds):
+    mask = np.ascontiguousarray(mask)
+    seeds = np.ascontiguousarray(seeds)
+
+    return tesselate(mask=mask, seeds=seeds)
+
+
+# =========================
+# 3️⃣ mesh（轻封装）
+# =========================
+def squish_mesh(volume, spacing, n_regions):
+
+    data = pv.wrap(volume)
+    grid = pv.create_grid(data)
+
+    data = grid.sample(data, categorical=True)
+    data = data.pack_labels()
+
+    mesh = data.contour_labeled(
+        n_labels=n_regions,
+        smoothing=True
+    )
+
+    mesh = mesh.connectivity('largest')
+
+    return mesh
+
+
+# =========================
+# 4️⃣ 总入口（你pipeline用这个）
+# =========================
+def generate_voronoi(field):
+
+    mask = np.zeros_like(field)
+    mask[field > field.min()] = 1
+
+    seeds = squish_sampling(field)
+
+    volume = squish_voronoi(mask, seeds)
+
+    mesh = squish_mesh(volume, spacing=(1,1,1), n_regions=len(seeds))
+
+    return mesh
