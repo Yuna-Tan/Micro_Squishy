@@ -1,5 +1,5 @@
 from src.load_raw import load_raw
-from src.core.scalar_field import normalize_scalar
+from src.core.scalar_field import normalize_scalar, normalize_scalar_lattice
 from src.core.mapping import scalar_to_target
 from src.core.calibration import map_to_param
 
@@ -58,7 +58,7 @@ def generate_sample(raw_path, family, structure, params):
 
     elif family == "Lattice":
         scalar = load_raw(raw_path)
-        scalar = normalize_scalar(scalar)
+        scalar = normalize_scalar_lattice(scalar)
 
         mesh = generate_lattice_implicit(
             param_field=scalar,
