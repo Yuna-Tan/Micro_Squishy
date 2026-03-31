@@ -60,16 +60,18 @@ def generate_sample(raw_path, family, structure, params):
         scalar = load_raw(raw_path)
         scalar = normalize_scalar(scalar)
 
-        crop_shape = (24, 24, 24)
+        crop_n = int(params.get("crop_size", 64))
+        crop_shape = (crop_n, crop_n, crop_n)
         scalar = crop_center_volume(scalar, crop_shape)
 
         mesh = generate_lattice_implicit(
             param_field=scalar,
-            cell_size=params["cell_size"],
-            thickness=params["thickness"],
-            cell_type=structure
+            cell_size=int(params["cell_size"]),
+            thickness=float(params["thickness"]),
+            cell_type=structure,
+            node_radius_factor=float(params.get("node_radius_factor", 1.15)),
+            smooth_sigma=float(params.get("smooth_sigma", 0.6)),
         )
-
         return mesh
 
     else:
@@ -79,9 +81,8 @@ def generate_sample(raw_path, family, structure, params):
 def crop_center_volume(volume, crop_shape):
     nx, ny, nz = volume.shape
     cx, cy, cz = crop_shape
-
-    sx = (nx - cx) // 2
-    sy = (ny - cy) // 2
-    sz = (nz - cz) // 2
-
-    return volume[sx:sx+cx, sy:sy+cy, sz:sz+cz]
+    sx = max((nx - cx) // 2, 0)
+    sy = max((ny - cy) // 2, 0)
+    sz = max((nz - cz) // 2, 0)
+    
+    return volume[sx:sx + cx, sy:sy + cy, sz:sz + cz]

@@ -47,11 +47,23 @@ STRUCTURE_FAMILIES = {
     },
 
     "Lattice": {
-    "structures": ["octet", "bcc", "cubic"],
-    "params": {
-        "cell_size": (5, 20, 10),
-        "thickness": (0.2, 1.0, 0.4)
-        }
+        "structures": ["octet", "bcc", "cubic"],
+        "params": {
+            # unit-cell size in voxels
+            "cell_size": (6, 20, 10),
+
+            # strut diameter as fraction of one unit cell
+            "thickness": (0.15, 0.80, 0.40),
+
+            # node radius multiplier relative to strut radius
+            "node_radius_factor": (1.00, 1.80, 1.15),
+
+            # smoothing on signed field before marching cubes
+            "smooth_sigma": (0.0, 2.0, 0.6),
+
+            # center crop size for lattice generation
+            "crop_size": (32, 96, 64),
+        },
     }
 }
 

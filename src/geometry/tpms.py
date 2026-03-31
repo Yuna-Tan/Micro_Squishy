@@ -21,7 +21,7 @@ def generate_tpms_from_raw(raw_mesh,
         base_scale=k_min,
         threshold=threshold,
         lattice_type=lattice_type,
-        structure_mode="sheet",   # ⭐关键
+        structure_mode="sheet",   
         gradient_strategy="blend"
     )
 
