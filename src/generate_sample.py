@@ -58,7 +58,7 @@ def generate_sample(raw_path, family, structure, params):
 
     elif family == "Lattice":
         scalar = load_raw(raw_path)
-        scalar = normalize_scalar_lattice(scalar)
+        scalar = normalize_scalar(scalar)
 
         mesh = generate_lattice_implicit(
             param_field=scalar,

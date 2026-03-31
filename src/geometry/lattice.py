@@ -105,9 +105,26 @@ def generate_lattice_implicit(
     # 🔥 核心：thickness + scalar mapping
     # ===============================
 
-    # scalar → thickness variation
-    local_thickness = thickness * (0.5 + param_field)
+    # ===============================
+    # mild general scalar control
+    # ===============================
+    s = param_field.astype(np.float32)
 
+    # param_field should already be normalized in generate_sample.py,
+    # but clip again for safety
+    s = np.clip(s, 0.0, 1.0)
+
+    # 0.5 is neutral
+    centered = s - 0.5
+
+    # mild contrast, not aggressive
+    # low side stays present, high side does not become solid too quickly
+    scale = 1.0 + 0.6 * centered
+
+    # keep thickness variation narrow
+    scale = np.clip(scale, 0.75, 1.25)
+
+    local_thickness = thickness * scale
     field = dist_field - local_thickness
 
     # ===============================
