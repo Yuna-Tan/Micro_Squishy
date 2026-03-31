@@ -60,6 +60,9 @@ def generate_sample(raw_path, family, structure, params):
         scalar = load_raw(raw_path)
         scalar = normalize_scalar(scalar)
 
+        crop_shape = (24, 24, 24)
+        scalar = crop_center_volume(scalar, crop_shape)
+
         mesh = generate_lattice_implicit(
             param_field=scalar,
             cell_size=params["cell_size"],
@@ -71,3 +74,14 @@ def generate_sample(raw_path, family, structure, params):
 
     else:
         raise ValueError("Unknown Family")
+
+
+def crop_center_volume(volume, crop_shape):
+    nx, ny, nz = volume.shape
+    cx, cy, cz = crop_shape
+
+    sx = (nx - cx) // 2
+    sy = (ny - cy) // 2
+    sz = (nz - cz) // 2
+
+    return volume[sx:sx+cx, sy:sy+cy, sz:sz+cz]

@@ -193,6 +193,45 @@ class MainWindow(QtWidgets.QMainWindow):
             print("No mesh to export")
             return
 
+        # try:
+        #     params = self.get_params()
+        #     out_dir = CURRENT_DIR / "exports" / f"{params['structure']}"
+        #     out_dir.mkdir(parents=True, exist_ok=True)
+
+        #     filename = (
+        #         f"{params['lattice_type']}_"
+        #         f"{params['min_cell_size']}_"
+        #         f"{params['max_cell_size']}_"
+        #         f"{params['threshold']}.stl"
+        #     )
+        #     out_path = out_dir / filename
+
+        #     mesh_to_save = self.mesh
+        #     if not isinstance(mesh_to_save, pv.PolyData):
+        #         mesh_to_save = mesh_to_save.extract_surface()
+
+        #     mesh_to_save = mesh_to_save.triangulate()
+        #     mesh_to_save.save(out_path)
+
+        #     print(f"Saved STL: {out_path}")
+        #     self.plotter.add_text(
+        #         f"Saved: {filename}",
+        #         name="status",
+        #         position="upper_right",
+        #         color="green",
+        #         font_size=12,
+        #     )
+
+        # except Exception as e:
+        #     print(f"Save failed: {e}")
+        #     self.plotter.add_text(
+        #         f"Save error: {str(e)}",
+        #         name="status",
+        #         position="upper_right",
+        #         color="red",
+        #         font_size=12,
+        #     )
+
         file_path, _ = QtWidgets.QFileDialog.getSaveFileName(
             self, "Save STL", "", "STL Files (*.stl)"
         )

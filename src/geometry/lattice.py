@@ -47,9 +47,23 @@ def get_unit_cell_edges(cell_type):
         edges = [(i, c) for i in range(8)]
 
     elif cell_type == "octet":
+        face_centers = np.array([
+            [0.5, 0.5, 0.0],
+            [0.5, 0.5, 1.0],
+            [0.5, 0.0, 0.5],
+            [0.5, 1.0, 0.5],
+            [0.0, 0.5, 0.5],
+            [1.0, 0.5, 0.5],
+        ])
+        V = np.vstack([V, face_centers])
+
         edges = [
-            (0,6),(1,7),(2,4),(3,5),
-            (0,7),(1,6),(2,5),(3,4)
+            (8,0),(8,1),(8,2),(8,3),
+            (9,4),(9,5),(9,6),(9,7),
+            (10,0),(10,1),(10,4),(10,5),
+            (11,2),(11,3),(11,6),(11,7),
+            (12,0),(12,3),(12,4),(12,7),
+            (13,1),(13,2),(13,5),(13,6),
         ]
 
     else:
@@ -124,7 +138,24 @@ def generate_lattice_implicit(
     # keep thickness variation narrow
     scale = np.clip(scale, 0.75, 1.25)
 
-    local_thickness = thickness * scale
+    # scalar already normalized to [0,1]
+    s = np.clip(param_field.astype(np.float32), 0.0, 1.0)
+
+    # use 0.5 as neutral center
+    centered = s - 0.5
+
+    # mild modulation only
+    scale = 1.0 + 0.5 * centered
+    scale = np.clip(scale, 0.8, 1.2)
+
+    # interpret thickness as STRUT DIAMETER in mm
+    voxel_size = 0.2
+    cell_size_mm = cell_size * voxel_size
+
+    # convert diameter(mm) -> radius in normalized cell coordinates
+    local_radius = 0.5 * thickness / cell_size_mm
+
+    local_thickness = local_radius * scale
     field = dist_field - local_thickness
 
     # ===============================
@@ -136,5 +167,8 @@ def generate_lattice_implicit(
     faces = np.hstack([np.full((faces.shape[0], 1), 3), faces])
 
     mesh = pv.PolyData(verts, faces)
+    mesh = mesh.clean()
+    mesh = mesh.triangulate()
+    mesh = mesh.connectivity("largest")
 
     return mesh

@@ -16,13 +16,13 @@ def load_raw(
     return data.reshape(shape, order="F").astype(np.float32) / 65535.0
 
 def load_raw_to_fieldlat_mesh(
-    path: str | Path,
+    path: str,
     shape=(100, 100, 100),
-    spacing=(0.2, 0.2, 0.2),
+    spacing=(1, 1, 1),
     normalize=True
 ) -> pv.UnstructuredGrid:
     
-    path = Path(path)
+    # path = Path(path)
 
     # read raw
     data = np.fromfile(path, dtype=np.uint16)
